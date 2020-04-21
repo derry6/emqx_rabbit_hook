@@ -1,0 +1,118 @@
+%%-*- mode: erlang -*-
+%% EMQ X R3.0 config mapping
+
+{mapping, "hook.rabbit.host", "emqx_rabbit_hook.server", [
+    {default, "127.0.0.1"},
+    {datatype, string}
+]}.
+{mapping, "hook.rabbit.port", "emqx_rabbit_hook.server", [
+    {default, 5672},
+    {datatype, integer}
+]}.
+{mapping, "hook.rabbit.virtual_host", "emqx_rabbit_hook.server", [
+    {default, "/"},
+    {datatype, string}
+]}.
+
+{mapping, "hook.rabbit.username", "emqx_rabbit_hook.server", [
+{default, "guest"},
+{datatype, string}
+]}.
+{mapping, "hook.rabbit.password", "emqx_rabbit_hook.server", [
+    {default, "guest"},
+    {datatype, string}
+]}.
+
+{mapping, "hook.rabbit.heartbeat", "emqx_rabbit_hook.server", [
+    {default, 10},
+    {datatype, integer}
+]}.
+
+{mapping, "hook.rabbit.auto_reconnect", "emqx_rabbit_hook.server", [
+    {default, 1},
+    {datatype, integer}
+]}.
+{mapping, "hook.rabbit.ssl_opts", "emqx_rabbit_hook.server", [
+    {default, ""},
+    {datatype, string}
+]}.
+
+{mapping, "hook.rabbit.pool_size", "emqx_rabbit_hook.server", [
+    {default, 10},
+    {datatype, integer}
+]}.
+
+{translation, "emqx_rabbit_hook.server", fun(Conf) ->
+[
+    {pool_size, cuttlefish:conf_get("hook.rabbit.pool_size", Conf)},
+    {host, cuttlefish:conf_get("hook.rabbit.host", Conf)},
+    {port, cuttlefish:conf_get("hook.rabbit.port", Conf)},
+    {virtual_host, cuttlefish:conf_get("hook.rabbit.virtual_host", Conf)},
+    {username, cuttlefish:conf_get("hook.rabbit.username", Conf)},
+    {password, cuttlefish:conf_get("hook.rabbit.password", Conf)},
+    {heartbeat, cuttlefish:conf_get("hook.rabbit.heartbeat", Conf)},
+    {auto_reconnect, cuttlefish:conf_get("hook.rabbit.auto_reconnect", Conf)}
+]
+end}.
+
+{mapping, "hook.rabbit.encode_payload", "emqx_rabbit_hook.encode_payload", [
+{default, undefined},
+{datatype, {enum, [base62, base64]}}
+]}.
+
+{mapping, "hook.rabbit.rule.client.connect.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.client.connack.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.client.connected.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.client.disconnected.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.client.subscribe.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.client.unsubscribe.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.session.subscribed.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.session.unsubscribed.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.session.terminated.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.message.publish.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.message.acked.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+{mapping, "hook.rabbit.rule.message.delivered.$name", "emqx_rabbit_hook.rules", [
+{datatype, string}
+]}.
+
+
+{translation, "emqx_rabbit_hook.rules", fun(Conf) ->
+Hooks = cuttlefish_variable:filter_by_prefix("hook.rabbit.rule", Conf),
+lists:map(
+fun({[_, _, _, Name1,Name2, _], Val}) ->
+{lists:concat([Name1, ".", Name2]), Val}
+end, Hooks)
+end}.

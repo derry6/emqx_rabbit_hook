@@ -1,0 +1,28 @@
+{application, emqx_rabbit_hook,
+    [{description, "EMQ X RabbitMQ Hook"},
+        {vsn, "git"},
+        {modules, []},
+        {registered, [emqx_rabbit_hook_sup]},
+        {applications,
+            [
+                kernel,
+                stdlib,
+                ecpool,
+                rabbit_common,
+                amqp_client,
+                bson
+            ]
+        },
+        {mod, {emqx_rabbit_hook_app, []}},
+        {env, []},
+        {licenses, ["Apache-2.0"]},
+
+        {maintainers, ["Derry6 <ludey2015@yeah.net>"]},
+        {links,
+            [
+                {"Homepage", "https://github.com/derry6/emqx_rabbit_hook"},
+                {"Github", "https://github.com/derry6/emqx_rabbit_hook"}
+            ]
+        }
+    ]
+}.
