@@ -24,7 +24,8 @@
 -include_lib("emqx/include/emqx.hrl").
 -include_lib("emqx/include/logger.hrl").
 
--logger_header("[AMQP]").
+-logger_header("[RabbitHook]").
+
 %% APIs
 -export([load/0, register_metrics/0, unload/0]).
 %% Hooks callback
@@ -91,7 +92,6 @@ on_client_connect(ConnInfo = #{clientid := ClientId, username := Username, peern
         keepalive => maps:get(keepalive, ConnInfo),
         proto_ver => maps:get(proto_ver, ConnInfo)
     },
-    io:format("On client connect: ~p~n", [Env]),
     amqp_pub(Env, Params),
     ok;
 on_client_connect(#{}, _ConnProp, _Env) -> ok.
@@ -166,7 +166,7 @@ on_client_subscribe(#{clientid := ClientId, username := Username}, _Properties, 
                         topic => Topic,
                         opts => Opts
                     },
-                    amqp_pub("client.subscribe", Params)
+                    amqp_pub(Env, Params)
                 end,
                 Topic, Filter)
         end,
@@ -328,10 +328,12 @@ on_message_acked(#{clientid := ClientId}, Message = #message{topic = Topic, flag
 %% Internal functions
 %%--------------------------------------------------------------------
 amqp_pub(_Env = #{exchange := Exchange, routing := Routing}, Params) ->
-    Payload = bson_binary:put_document(Params),
-    io:format("[AMQP] pub exchange=~p, routing=~p~n", [Exchange, Routing]),
-    emqx_rabbit_hook_cli:pub(Exchange, Routing, Payload),
-    ok.
+    case application:get_env(?APP, payload_encoding, json) of
+        bson ->
+            emqx_rabbit_hook_cli:pub(Exchange, Routing, bson_binary:put_document(Params));
+        _ ->
+            emqx_rabbit_hook_cli:pub(Exchange, Routing, emqx_json:encode(Params))
+    end.
 
 with_filter(Fun, _, undefined) -> Fun(), ok;
 with_filter(Fun, Topic, Filter) ->

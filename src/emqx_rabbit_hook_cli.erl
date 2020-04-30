@@ -12,13 +12,13 @@
 
 connect(Opts) ->
   {ok, Params} = emqx_rabbit_hook_env:rabbit_params(Opts),
-  io:format("[AMQP] connecting ~p~n", [Params]),
+  ?LOG(info, "Connecting ~p", [Params]),
   case amqp_connection:start(Params) of
     {ok, Conn} ->
-      io:format("Connected: ~p~n", [Conn]),
+      ?LOG(info, "Connected: ~p", [Conn]),
       {ok, Conn};
     {error, Error} ->
-      io:format("[AMQP] Can't connect to mqtt broker: ~p~n", [Error]),
+      ?LOG(error, "Can't connect to mqtt broker: ~p", [Error]),
       {error, Error}
   end.
 
@@ -47,7 +47,7 @@ pub(Exchange, RoutingKey, Payload) ->
         #'basic.publish'{exchange = Exchange, routing_key = RoutingKey},
         #amqp_msg{props = #'P_basic'{delivery_mode = 2}, payload = Payload}
       ),
-      io:format("[AMQP] message published, exchange = ~p, routing = ~p~n", [Exchange, RoutingKey]),
+      ?LOG(debug, "Message published, exchange = ~p, routing = ~p", [Exchange, RoutingKey]),
       ok = amqp_channel:close(Channel),
       ok
     end

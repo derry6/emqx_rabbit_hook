@@ -27,18 +27,17 @@
     {default, 10},
     {datatype, integer}
 ]}.
-
-{mapping, "hook.rabbit.auto_reconnect", "emqx_rabbit_hook.server", [
-    {default, 1},
+{mapping, "hook.rabbit.channel_max", "emqx_rabbit_hook.server", [
+    {default, 2047},
     {datatype, integer}
 ]}.
-{mapping, "hook.rabbit.ssl_opts", "emqx_rabbit_hook.server", [
-    {default, ""},
-    {datatype, string}
-]}.
 
-{mapping, "hook.rabbit.pool_size", "emqx_rabbit_hook.server", [
-    {default, 10},
+{mapping, "hook.rabbit.frame_max", "emqx_rabbit_hook.server", [
+    {default, 0},
+    {datatype, integer}
+]}.
+{mapping, "hook.rabbit.connection_timeout", "emqx_rabbit_hook.server", [
+    {default, 60000},
     {datatype, integer}
 ]}.
 
@@ -51,14 +50,54 @@
     {username, cuttlefish:conf_get("hook.rabbit.username", Conf)},
     {password, cuttlefish:conf_get("hook.rabbit.password", Conf)},
     {heartbeat, cuttlefish:conf_get("hook.rabbit.heartbeat", Conf)},
-    {auto_reconnect, cuttlefish:conf_get("hook.rabbit.auto_reconnect", Conf)}
+    {channel_max, cuttlefish:conf_get("hook.rabbit.channel_max", Conf)},
+    {frame_max, cuttlefish:conf_get("hook.rabbit.frame_max", Conf)},
+    {connection_timeout, cuttlefish:conf_get("hook.rabbit.connection_timeout", Conf)}
 ]
 end}.
 
-{mapping, "hook.rabbit.encode_payload", "emqx_rabbit_hook.encode_payload", [
-{default, undefined},
-{datatype, {enum, [base62, base64]}}
+%% =================== SSL configs ========================
+{mapping, "hook.rabbit.ssl_enabled", "emqx_rabbit_hook.ssl_enabled", [
+    {default, off},
+    {datatype, flag}
 ]}.
+{mapping, "hook.rabbit.ssl_cacertfile", "emqx_rabbit_hook.ssl_cacertfile", [
+    {default, ""},
+    {datatype, string}
+]}.
+{mapping, "hook.rabbit.ssl_certfile", "emqx_rabbit_hook.ssl_certfile", [
+    {default, ""},
+    {datatype, string}
+]}.
+{mapping, "hook.rabbit.ssl_keyfile", "emqx_rabbit_hook.ssl_keyfile", [
+    {default, ""},
+    {datatype, string}
+]}.
+{mapping, "hook.rabbit.ssl_verify_peer", "emqx_rabbit_hook.ssl_verify_peer", [
+    {default, off},
+    {datatype, flag}
+]}.
+
+
+%% =================== Pool Configs ========================
+
+{mapping, "hook.rabbit.payload_encoding", "emqx_rabbit_hook.payload_encoding", [
+{default, undefined},
+{datatype, {enum, [bson, json]}}
+]}.
+
+{mapping, "hook.rabbit.auto_reconnect", "emqx_rabbit_hook.auto_reconnect", [
+    {default, 1},
+    {datatype, integer}
+]}.
+
+{mapping, "hook.rabbit.pool_size", "emqx_rabbit_hook.pool_size", [
+    {default, 10},
+    {datatype, integer}
+]}.
+
+
+%% ====================== Rule configs ========================
 
 {mapping, "hook.rabbit.rule.client.connect.$name", "emqx_rabbit_hook.rules", [
 {datatype, string}

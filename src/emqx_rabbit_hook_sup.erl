@@ -35,8 +35,9 @@ child_spec(UsePool) ->
     case UsePool of
         true ->
             {ok, Opts} = application:get_env(?APP, server),
-%%            todo: set auto_reconnect and pool_size options
-            [ecpool:pool_spec(?APP, ?APP, emqx_rabbit_hook_cli, Opts)];
+            Auto = application:get_env(?APP, auto_reconnect, 1),
+            Size = application:get_env(?APP, pool_size, 10),
+            [ecpool:pool_spec(?APP, ?APP, emqx_rabbit_hook_cli, [{auto_reconnect, Auto}, {pool_size, Size} | Opts])];
         false ->
             []
     end.
