@@ -21,18 +21,6 @@
 %% API
 -export([rabbit_params/1, hook_rules/0, payload_encoding/0]).
 
-get_ssl_options(Enabled) when Enabled == on ->
-  Opts = [
-    {cacertfile, application:get_env(?APP, ssl_cacertfile, "")},
-    {certfile, application:get_env(?APP, ssl_certfile, "")},
-    {keyfile, application:get_env(?APP, ssl_keyfile, "")}
-  ],
-  case application:get_env(?APP, ssl_verify_peer, off) of
-    on -> [{verify, verify_peer} | Opts];
-    _ -> Opts
-  end;
-get_ssl_options(_) -> none.
-
 rabbit_params(Opts) ->
   Params = #amqp_params_network{
     host = proplists:get_value(host, Opts),
@@ -43,7 +31,7 @@ rabbit_params(Opts) ->
     channel_max = proplists:get_value(channel_max, Opts),
     frame_max = proplists:get_value(frame_max, Opts),
     connection_timeout =  proplists:get_value(connection_timeout, Opts),
-    ssl_options = get_ssl_options(application:get_env(?APP, ssl_enabled, off))
+    ssl_options = application:get_env(?APP, ssl_opts, [])
   },
   {ok, Params}.
 

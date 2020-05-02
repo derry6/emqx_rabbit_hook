@@ -34,10 +34,13 @@ init([]) ->
 child_spec(UsePool) ->
     case UsePool of
         true ->
-            {ok, Opts} = application:get_env(?APP, server),
-            Auto = application:get_env(?APP, auto_reconnect, 1),
-            Size = application:get_env(?APP, pool_size, 10),
-            [ecpool:pool_spec(?APP, ?APP, emqx_rabbit_hook_cli, [{auto_reconnect, Auto}, {pool_size, Size} | Opts])];
+            {ok, ServerOpts} = application:get_env(?APP, server),
+            Opts = [
+                {auto_reconnect, application:get_env(?APP, auto_reconnect, 1)},
+                {pool_size, application:get_env(?APP, pool_size, 10)}
+                | ServerOpts
+            ],
+            [ecpool:pool_spec(?APP, ?APP, emqx_rabbit_hook_cli, Opts)];
         false ->
             []
     end.
